@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Background</title>
+    <style>
+        #loader {
+            display: none;
+        }
+
+        #resultContainer {
+            margin-top: 10px;
+            position: relative;
+        }
+
+        #resultContainer img {
+            max-width: 100%;
+            height: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #errorContainer {
+            color: red;
+            margin-top: 10px;
+        }
+
+        #viewResultLink {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Remove Background</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="file" id="bgInput" accept="image/*">
+    <input type="file" id="overlayInput" accept="image/*">
+    <button onclick="processImage()">Process Image</button>
+
+    <div id="loader">Processing...</div>
+    <div id="resultContainer"></div>
+    <div id="errorContainer"></div>
+    <a id="viewResultLink" href="#" target="_blank">View Processed Image</a>
+
+    <script>
+        function processImage() {
+            const fileInput = document.getElementById('imageInput');
+            const bgInput = document.getElementById('bgInput');
+            const overlayInput = document.getElementById('overlayInput');
+
+            const file = fileInput.files[0];
+            const bgFile = bgInput.files[0];
+            const overlayFile = overlayInput.files[0];
+
+            if (file && bgFile && overlayFile) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('bg', bgFile);
+                formData.append('overlay', overlayFile);
+
+                // Show loader while processing
+                const loader = document.getElementById('loader');
+                loader.style.display = 'block';
+
+                // Clear previous results and errors
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.innerHTML = '';
+                const errorContainer = document.getElementById('errorContainer');
+                errorContainer.innerHTML = '';
+                const viewResultLink = document.getElementById('viewResultLink');
+                viewResultLink.style.display = 'none';
+
+                fetch('/remove_background', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    // Hide loader after processing
+                    loader.style.display = 'none';
+
+                    if ('result_url' in data) {
+                        // Display the processed images
+                        const img = document.createElement('img');
+                        img.src = data.result_url;
+                        resultContainer.appendChild(img);
+
+                        // Display the view result link
+                        viewResultLink.href = data.result_url;
+                        viewResultLink.style.display = 'block';
+                    } else if ('error' in data) {
+                        // Display the error message
+                        errorContainer.innerHTML = `Error: ${data.error}`;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
