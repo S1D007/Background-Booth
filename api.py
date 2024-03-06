@@ -13,6 +13,7 @@ import base64
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 seg_net = TracerUniversalB7(device='cpu', batch_size=1)
 fba = FBAMatting(device='cpu', input_tensor_size=4 * 1024, batch_size=1)
