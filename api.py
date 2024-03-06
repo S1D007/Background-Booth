@@ -5,6 +5,7 @@ from carvekit.ml.wrap.tracer_b7 import TracerUniversalB7
 from carvekit.pipelines.postprocessing import MattingMethod
 from carvekit.pipelines.preprocessing import PreprocessingStub
 from carvekit.trimap.generator import TrimapGenerator
+from flask_cors import CORS
 import PIL.Image
 import io
 import os
